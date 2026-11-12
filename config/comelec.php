@@ -65,6 +65,34 @@ return [
     'change_request_action_types' => [],
 
     /*
+     * Phase 04A: the kind of election (`elections.type`), key => label. A descriptive label, never a code branch.
+     * The kinds come from docs/REQUIREMENTS.md ("college, department, year-level, sectoral, special, and
+     * university-wide elections"). It says nothing about who may vote or stand: that is the election's SCOPE,
+     * a later configuration step (representation groups / eligibility rules), not a column on `elections`.
+     */
+    'election_types' => [
+        'UNIVERSITY_WIDE' => 'University-wide',
+        'COLLEGE' => 'College',
+        'DEPARTMENT' => 'Department',
+        'YEAR_LEVEL' => 'Year level',
+        'SECTORAL' => 'Sectoral',
+        'SPECIAL' => 'Special',
+    ],
+
+    /*
+     * Phase 04A: optional starting templates (docs/ELECTION_CONFIGURATION.md), key => label, kept in
+     * `elections.template_key` for provenance. A template is a starting point only and is DISTINCT from the election
+     * type. No template contents (contests, eligibility, rules) are defined yet, so choosing one initializes nothing;
+     * "Customize from scratch" is simply no template (NULL).
+     */
+    'election_templates' => [
+        'UNIVERSITY_WIDE' => 'University-Wide',
+        'COLLEGE_DEPARTMENT' => 'College / Department',
+        'YEAR_REPRESENTATIVE' => 'Year Representative',
+        'SECTORAL' => 'Sectoral',
+    ],
+
+    /*
      * Student master data / Data Center import (Phase 03A).
      *
      * Everything institution-shaped lives here, not in code. `year_levels` is the ONE internal

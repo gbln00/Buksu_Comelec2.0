@@ -129,3 +129,13 @@ All data is synthetic. Suite: `tests/Feature/Admin/StudentMasterlistTest.php` (p
 - Pagination: 25 per page, stable order, distinct pages, last page, rows beyond the page not rendered, page reset on search/filter change.
 - Modal: closed by default; shows identity, email, placement, status and import information; "not loaded" case; close and Escape clear the selection; deep link and unknown id; list state kept while open.
 - Privacy: no `google_subject`, raw row or other student's data in the page, modal or snapshot; the list shows no emails; component source has no write call, model or raw-row access; listing and opening write nothing.
+
+## Phase 04A tests (election draft management)
+All data is synthetic. Suite: `tests/Feature/Election/ElectionDraftTest.php` (plus allow-lists in `RouteProtectionTest.php` and `AdminDashboardTest.php`).
+- Authorization: guest redirected, student 403, admin 200 on list/new/show; components refuse non-admins; policy `view`/`create`; broken roster; unknown or non-numeric id 404.
+- Creation: DRAFT election with description, `type`, `template_key`, `creation_key`; version 1 linked; composite FK refusal; type and template independent; no contests/rules/candidates created; invalid input writes nothing; rollback then retry; audit carries no name/description.
+- Duplicate submissions: same key twice, changed retry, upper-case key, cache flush, DB unique index, simulated lost race (loser rolls back, gets winner), other admin refused, locked page properties, second click no-op.
+- Pages: form fields and template note, validation, redirect with message, failure shown without details.
+- Workspace: saved details, template provenance, scope "Not configured yet", configuration status, read-only, any state.
+- List: title, every state listed, Open link per row, state filter agrees with the query, unknown filter dropped, deep link, pagination 15, read-only, no personal data.
+- Scope: sidebar current on all three pages; palette scoped; writes only through the service.

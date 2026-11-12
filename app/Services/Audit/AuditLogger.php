@@ -26,6 +26,9 @@ class AuditLogger
     private const FORBIDDEN_KEY = '/token|secret|password|credential|google_subject|^sub$|^email$|_email$|selection|candidate_id/i';
 
     /**
+     * $electionId is optional and goes LAST so every existing call keeps working; it fills the nullable
+     * audit_logs.election_id column for election-related events (ids only, never election names).
+     *
      * @param  array<string, mixed>  $metadata
      */
     public function record(
@@ -38,6 +41,7 @@ class AuditLogger
         ?string $description = null,
         array $metadata = [],
         ?string $correlationId = null,
+        ?int $electionId = null,
     ): void {
         self::assertMetadataIsSafe($metadata);
 
@@ -46,6 +50,7 @@ class AuditLogger
             'severity' => $severity,
             'actor_type' => $actorType,
             'actor_id' => $actorId === null ? null : (string) $actorId,
+            'election_id' => $electionId,
             'target_type' => $targetType,
             'target_id' => $targetId === null ? null : (string) $targetId,
             'description' => $description,

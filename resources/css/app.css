@@ -471,3 +471,41 @@ dialog[aria-labelledby="student-title"]::backdrop {
     backdrop-filter: blur(5px);
     -webkit-backdrop-filter: blur(5px);
 }
+
+/*
+ * BUKSU COMELEC 2K26 basic theme (Phase 04A). Scoped to the election pages only: it re-points the existing --ui-*
+ * tokens inside its own element, so the x-ui components keep working unchanged and the rest of the admin shell is
+ * not redesigned yet. Palette: purple #380041, dark purple #210027, yellow #F9B00F, white #FFFFFF, dark #0C0C0C.
+ */
+.theme-2k26 {
+    --k26-purple: #380041;
+    --k26-purple-dark: #210027;
+    --k26-yellow: #f9b00f;
+    --k26-white: #ffffff;
+    --k26-black: #0c0c0c;
+
+    --ui-canvas: var(--k26-black);
+    --ui-surface: var(--k26-purple-dark);
+    --ui-surface-subtle: var(--k26-purple);
+    --ui-surface-sunken: color-mix(in oklab, var(--k26-black) 55%, var(--k26-purple-dark));
+
+    --ui-border: color-mix(in oklab, var(--k26-yellow) 20%, var(--k26-purple-dark));
+    --ui-border-strong: color-mix(in oklab, var(--k26-yellow) 40%, var(--k26-purple-dark));
+    --ui-control-border: color-mix(in oklab, var(--k26-white) 50%, var(--k26-purple-dark));
+
+    --ui-text: var(--k26-white);
+    --ui-text-muted: color-mix(in oklab, var(--k26-white) 78%, var(--k26-purple-dark));
+    --ui-text-subtle: color-mix(in oklab, var(--k26-white) 62%, var(--k26-purple-dark));
+
+    --ui-accent: var(--k26-yellow);
+    --ui-accent-content: var(--k26-yellow);
+    --ui-accent-foreground: var(--k26-purple-dark);
+    --ui-brass: var(--k26-yellow);
+    --ui-brass-text: var(--k26-yellow);
+    --ui-focus-ring: var(--k26-yellow);
+
+    padding: 1.25rem;
+    border-radius: var(--ui-radius);
+    background-color: var(--k26-black);
+    color: var(--ui-text);
+}
