@@ -71,7 +71,7 @@ test('the admin area exposes no way to create, delete, promote or demote admins'
         ->sort()->values()->all();
 
     // The complete, explicit admin surface. Anything new must be added here on purpose.
-    expect($adminUris)->toBe(['admin', 'admin/access-issues', 'admin/approvals', 'admin/data-center', 'admin/students']);
+    expect($adminUris)->toBe(['admin', 'admin/access-issues', 'admin/approvals', 'admin/data-center', 'admin/elections', 'admin/elections/new', 'admin/elections/{election}', 'admin/students']);
 
     // No route anywhere mentions admin management.
     $all = collect(Route::getRoutes()->getRoutes())->map(fn ($r) => strtolower($r->uri().' '.$r->getName()));

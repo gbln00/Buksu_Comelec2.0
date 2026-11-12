@@ -212,6 +212,12 @@ Key fields:
 
 \- \`type\` as a descriptive/configuration label, not a code branch.
 
+\- \`description\` — optional free text (Phase 04A, nullable).
+
+\- \`template_key\` — optional provenance of the starting template chosen at creation; \`NULL\` = "Customize from scratch". Distinct from \`type\`; carries no configuration (Phase 04A, nullable).
+
+\- \`creation_key\` — optional UUID of the creation form submission, unique when present; makes draft creation idempotent in the database (Phase 04A, nullable).
+
 \- \`state\` — configured lifecycle from the approved election state machine.
 
 \- \`current_config_version_id\`.

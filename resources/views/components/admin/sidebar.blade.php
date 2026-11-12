@@ -13,7 +13,7 @@
         'Elections' => [
             ['Student Import', 'admin.data-center', 'circle-stack'],
             ['Student Masterlist', 'admin.students', 'user-group'],
-            ['Elections', null, 'calendar-days'],
+            ['Elections', 'admin.elections', 'calendar-days'],
             ['Eligibility', null, 'identification'],
             ['Candidates', null, 'users'],
             ['Results & Analytics', null, 'chart-bar'],
@@ -48,7 +48,7 @@
                 <p class="ui-eyebrow px-3 pb-2 select-none">{{ __($group) }}</p>
                 <ul class="space-y-0.5">
                     @foreach ($items as [$label, $route, $icon])
-                        @php $current = $route && request()->routeIs($route); @endphp
+                        @php $current = $route && request()->routeIs($route, $route.'.*'); @endphp
                         <li>
                             @if ($route)
                                 <a href="{{ route($route) }}" @if ($current) aria-current="page" @endif

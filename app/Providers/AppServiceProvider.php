@@ -5,7 +5,9 @@ namespace App\Providers;
 use App\Http\Middleware\EnsureAdmin;
 use App\Http\Middleware\EnsureStudent;
 use App\Models\ChangeRequest;
+use App\Models\Election;
 use App\Policies\ChangeRequestPolicy;
+use App\Policies\ElectionPolicy;
 use App\Services\Auth\GoogleIdentityProvider;
 use App\Services\Auth\SocialiteGoogleIdentityProvider;
 use Illuminate\Support\Arr;
@@ -40,6 +42,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Gate::policy(ChangeRequest::class, ChangeRequestPolicy::class);
+        Gate::policy(Election::class, ElectionPolicy::class);
 
         // Livewire 4: middleware applied to Livewire update requests is limited to
         // this allow-list (Mechanisms\PersistentMiddleware). Route middleware such as
