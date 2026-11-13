@@ -252,6 +252,8 @@ Key fields:
 
 Reusable grouping of contests around configured dimensions such as college/year. The exact table-vs-columns implementation choice is deferred to Phase 1B migration design, provided it preserves configuration-driven behavior.
 
+Phase 04B: \`scope_definition_json\` holds an object of dimension key to a list of text values, written only by \`ElectionScopeService\` while the election is an editable draft. The keys and values are administrator configuration; the shape is a proposed convention (see OPEN_DECISIONS.md) and does not itself define eligibility. The table has no configuration-version column, so scope rows are not versioned.
+
 **### \`contests\`**
 
 Election contest/position definition.
@@ -751,6 +753,8 @@ For multi-seat contests, candidate totals and candidate percentages may collecti
 General operational activity history.
 
 Must not contain candidate selections, passwords, tokens, session IDs, or unnecessary sensitive data.
+
+Events that belong to an election fill \`election_id\` through the logger's \`electionId\` argument (Phase 04B); the metadata keeps ids and counts, never scope values.
 
 **### \`election_incidents\`**
 
