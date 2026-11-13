@@ -100,7 +100,7 @@ test('a student can never create or view an election, and neither can an admin o
         ->and(Gate::forUser($student)->denies('view', $election))->toBeTrue()
         ->and(Gate::forUser($this->admin)->allows('view', $election))->toBeTrue();
 
-    AdminUser::query()->whereKey(AdminUser::query()->max('id'))->delete(); // roster no longer intact
+    config(['comelec.admin_roster_size' => 4]); // the roster no longer matches the configured size, so it is not intact (no rows are deleted)
     expect(fn () => newDraft('Another'))->toThrow(AuthorizationException::class)
         ->and(Election::query()->count())->toBe(1);
 });
@@ -418,7 +418,7 @@ test('the workspace shows the saved details, the template provenance and the con
         ->toContain('College')                              // the election type
         ->toContain('Year Representative')                  // the template, shown separately
         ->toContain('no template configuration has been applied')
-        ->toContain('Not configured yet')                   // scope
+        ->toContain('No representation groups yet')          // scope summary
         ->toContain('Not scheduled yet')->toContain('Asia/Manila')
         ->toContain('Version 1')->toContain('None yet')->toContain('not snapshotted')
         ->toContain($this->admin->display_name)->toContain('theme-2k26')
@@ -552,7 +552,7 @@ test('the list is read-only and exposes no personal data', function () {
 test('the sidebar links Elections and marks it current on every election page', function () {
     [$election] = newDraft();
 
-    foreach ([route('admin.elections'), route('admin.elections.new'), route('admin.elections.show', $election->id)] as $url) {
+    foreach ([route('admin.elections'), route('admin.elections.new'), route('admin.elections.show', $election->id), route('admin.elections.scope', $election->id)] as $url) {
         $html = $this->actingAs($this->admin, 'admin')->get($url)->assertOk()->getContent();
 
         expect($html)->toContain('href="'.route('admin.elections').'"')
@@ -572,11 +572,11 @@ test('the 2K26 palette is scoped to the election pages and the rest of the admin
 
     $users = collect(glob(resource_path('views/livewire/admin/{,*/}*.blade.php'), GLOB_BRACE))
         ->filter(fn ($f) => str_contains(file_get_contents($f), 'theme-2k26'))->map(fn ($f) => basename(dirname($f)).'/'.basename($f))->sort()->values()->all();
-    expect($users)->toBe(['admin/elections.blade.php', 'elections/new.blade.php', 'elections/show.blade.php']);
+    expect($users)->toBe(['admin/elections.blade.php', 'elections/new.blade.php', 'elections/scope.blade.php', 'elections/show.blade.php']);
 });
 
 test('the election pages write only through the service and add no other write path', function () {
-    foreach (['elections.blade.php', 'elections/new.blade.php', 'elections/show.blade.php'] as $file) {
+    foreach (['elections.blade.php', 'elections/new.blade.php', 'elections/show.blade.php', 'elections/scope.blade.php'] as $file) {
         $source = file_get_contents(resource_path('views/livewire/admin/'.$file));
 
         expect($source)->not->toMatch('/->(update|insert|insertGetId|delete|upsert|save|create|forceDelete|truncate)\(/')

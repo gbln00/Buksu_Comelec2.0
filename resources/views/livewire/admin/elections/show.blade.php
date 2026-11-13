@@ -47,7 +47,23 @@ new #[Layout('components.layouts.admin')] #[Title('Election')] class extends Com
                 'locked_version.version_number as locked_version_number',
                 'admin_users.display_name as creator_name',
             ])
+            ->selectSub(
+                DB::table('representation_groups')->selectRaw('COUNT(*)')->whereColumn('representation_groups.election_id', 'elections.id'),
+                'scope_groups_count',
+            )
             ->firstOrFail();
+    }
+
+    /** Whether the scope page would let this administrator change scope right now (the policy decides, not this view). */
+    #[Computed]
+    public function canManageScope(): bool
+    {
+        $election = Election::query()
+            ->select(['id', 'state', 'current_config_version_id', 'locked_config_version_id'])
+            ->findOrFail($this->electionId);
+        $admin = Auth::guard('admin')->user();
+
+        return $admin instanceof AdminUser && Gate::forUser($admin)->allows('manageScope', $election);
     }
 }; ?>
 
@@ -69,14 +85,21 @@ new #[Layout('components.layouts.admin')] #[Title('Election')] class extends Com
                 <span>{{ __($types[$e->type] ?? $e->type) }}</span>
             </p>
         </section>
-        <x-ui.button icon="arrow-left" :href="route('admin.elections')" wire:navigate>{{ __('All elections') }}</x-ui.button>
+        <div class="flex flex-wrap gap-2">
+            @if ($this->canManageScope)
+                <x-ui.button variant="primary" :href="route('admin.elections.scope', $e->id)" wire:navigate>{{ __('Configure scope') }}</x-ui.button>
+            @else
+                <x-ui.button :href="route('admin.elections.scope', $e->id)" wire:navigate>{{ __('View scope') }}</x-ui.button>
+            @endif
+            <x-ui.button icon="arrow-left" :href="route('admin.elections')" wire:navigate>{{ __('All elections') }}</x-ui.button>
+        </div>
     </div>
 
     @if (session('election_status'))
         <x-ui.alert tone="success" wire:key="flash">{{ session('election_status') }}</x-ui.alert>
     @endif
 
-    <x-ui.alert tone="info">{{ __('This is a read-only view of the saved draft. Configuring the election (scope, contests, eligibility, candidates, ballot rules, schedule) is not available yet.') }}</x-ui.alert>
+    <x-ui.alert tone="info">{{ __('This workspace is read-only. Scope is configured on the scope page while the election is an editable draft; contests, eligibility, candidates, ballot rules and the schedule are later configuration steps.') }}</x-ui.alert>
 
     <div class="grid items-start gap-6 lg:grid-cols-2">
         <x-ui.panel :title="__('Saved details')" class="min-w-0">
@@ -101,7 +124,17 @@ new #[Layout('components.layouts.admin')] #[Title('Election')] class extends Com
                         @endif
                     </dd>
                 </div>
-                <div><dt class="text-muted">{{ __('Scope') }}</dt><dd>{{ __('Not configured yet') }} <span class="text-xs text-muted">({{ __('set in a later configuration step') }})</span></dd></div>
+                <div>
+                    <dt class="text-muted">{{ __('Scope') }}</dt>
+                    <dd>
+                        @if ((int) $e->scope_groups_count === 0)
+                            {{ __('No representation groups yet') }}
+                        @else
+                            {{ trans_choice(':count representation group|:count representation groups', (int) $e->scope_groups_count, ['count' => (int) $e->scope_groups_count]) }}
+                        @endif
+                        <a href="{{ route('admin.elections.scope', $e->id) }}" wire:navigate class="ml-1 text-xs underline">{{ $this->canManageScope ? __('Configure') : __('View') }}</a>
+                    </dd>
+                </div>
                 <div><dt class="text-muted">{{ __('Schedule') }}</dt><dd>@if ($e->opens_at || $e->closes_at) {{ $fmtTime($e->opens_at) }} → {{ $fmtTime($e->closes_at) }} @else {{ __('Not scheduled yet') }} @endif <span class="text-xs text-muted">({{ $e->timezone }})</span></dd></div>
             </dl>
         </x-ui.panel>
